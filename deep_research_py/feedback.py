@@ -12,7 +12,7 @@ async def generate_feedback(query: str) -> List[str]:
     response = await asyncio.get_event_loop().run_in_executor(
         None,
         lambda: openai_client.chat.completions.create(
-            model="o3-mini",
+            model="deepseek-r1-distill-qwen-7b",
             messages=[
                 {"role": "system", "content": system_prompt()},
                 {
@@ -20,13 +20,18 @@ async def generate_feedback(query: str) -> List[str]:
                     "content": f"Given this research topic: {query}, generate 3-5 follow-up questions to better understand the user's research needs. Return the response as a JSON object with a 'questions' array field.",
                 },
             ],
-            response_format={"type": "json_object"},
+            #response_format={"type": "json_schema"},
         ),
     )
 
     # Parse the JSON response
     try:
-        result = json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content
+        print(content)
+        j = content.split('```')[1][4:]
+        print(j)
+        result = json.loads(j)
+        print(result)
         return result.get("questions", [])
     except json.JSONDecodeError as e:
         print(f"Error parsing JSON response: {e}")

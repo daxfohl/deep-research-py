@@ -99,17 +99,22 @@ async def generate_serp_queries(
     response = await asyncio.get_event_loop().run_in_executor(
         None,
         lambda: openai_client.chat.completions.create(
-            model="o3-mini",
+            model="deepseek-r1-distill-qwen-7b",
             messages=[
                 {"role": "system", "content": system_prompt()},
                 {"role": "user", "content": prompt},
             ],
-            response_format={"type": "json_object"},
+            #response_format={"type": "json_schema"},
         ),
     )
 
     try:
-        result = json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content
+        print(content)
+        j = content.split('```')[1][4:]
+        print(j)
+        result = json.loads(j)
+        print(result)
         queries = result.get("queries", [])
         return [SerpQuery(**q) for q in queries][:num_queries]
     except json.JSONDecodeError as e:
@@ -147,17 +152,22 @@ async def process_serp_result(
     response = await asyncio.get_event_loop().run_in_executor(
         None,
         lambda: openai_client.chat.completions.create(
-            model="o3-mini",
+            model="deepseek-r1-distill-qwen-7b",
             messages=[
                 {"role": "system", "content": system_prompt()},
                 {"role": "user", "content": prompt},
             ],
-            response_format={"type": "json_object"},
+            #response_format={"type": "json_schema"},
         ),
     )
 
     try:
-        result = json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content
+        print(content)
+        j = content.split('```')[1][4:]
+        print(j)
+        result = json.loads(j)
+        print(result)
         return {
             "learnings": result.get("learnings", [])[:num_learnings],
             "followUpQuestions": result.get("followUpQuestions", [])[
@@ -191,17 +201,22 @@ async def write_final_report(
     response = await asyncio.get_event_loop().run_in_executor(
         None,
         lambda: openai_client.chat.completions.create(
-            model="o3-mini",
+            model="deepseek-r1-distill-qwen-7b",
             messages=[
                 {"role": "system", "content": system_prompt()},
                 {"role": "user", "content": user_prompt},
             ],
-            response_format={"type": "json_object"},
+            #response_format={"type": "json_schema"},
         ),
     )
 
     try:
-        result = json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content
+        print(content)
+        j = content.split('```')[1][4:]
+        print(j)
+        result = json.loads(j)
+        print(result)
         report = result.get("reportMarkdown", "")
 
         # Append sources
